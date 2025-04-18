@@ -6,11 +6,18 @@ import {
   REFRESH_TOKEN_SECRET_SIGNATURE
 } from '~/providers/JwtProvider'
 // Mock nhanh thông tin user thay vì phải tạo Database rồi query.
+
+const MOCK_ROLES = {
+  ADMIN: 'admin',
+  MODERATOR: 'moderator',
+  CLIENT: 'client'
+}
 const MOCK_DATABASE = {
   USER: {
     ID: 'congdanh-sample-id-12345678',
     EMAIL: 'congdanh.official@gmail.com',
-    PASSWORD: 'congdanh@123'
+    PASSWORD: 'congdanh@123',
+    ROLE: MOCK_ROLES.CLIENT
   }
 }
 
@@ -30,14 +37,15 @@ const login = async (req, res) => {
     //1. Tạo payload (userInfo) để đính kèm trong JWT gửi về Client
     const payload = {
       id: MOCK_DATABASE.USER.ID,
-      email: MOCK_DATABASE.USER.EMAIL
+      email: MOCK_DATABASE.USER.EMAIL,
+      role: MOCK_DATABASE.USER.ROLE
     }
     // 2. Tạo ra 2 token: access token và refresh token
     const accessToken = await JwtProvider.generateToken(
       payload,
       ACCESS_TOKEN_SECRET_SIGNATURE,
-      // '1h'
-      5
+      '1h'
+      // 5
     )
     const refreshToken = await JwtProvider.generateToken(
       payload,
@@ -101,13 +109,14 @@ const refreshToken = async (req, res) => {
     // Tạo access Token mới
     const payload = {
       id: refreshTokenDecoded.id,
-      email: refreshTokenDecoded.email
+      email: refreshTokenDecoded.email,
+      role: refreshTokenDecoded.role
     }
     const accessToken = await JwtProvider.generateToken(
       payload,
       ACCESS_TOKEN_SECRET_SIGNATURE,
-      // '1h'
-      5
+      '1h'
+      // 5
     )
     // Res lại cookies (đính kèm lại) accessToken cho case dùng cookies
     res.cookie('accessToken', accessToken, {

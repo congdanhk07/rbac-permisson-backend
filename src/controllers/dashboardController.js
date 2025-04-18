@@ -3,7 +3,8 @@ const access = async (req, res) => {
   try {
     const userInfo = {
       id: req.jwtDecoded.id,
-      email: req.jwtDecoded.email
+      email: req.jwtDecoded.email,
+      role: req.jwtDecoded.role
     }
     res.status(StatusCodes.OK).json(userInfo)
   } catch (error) {
